@@ -14,4 +14,4 @@ define("ONGDB", '');         //数据库配置
 define('ONGNAME', 'test');  //调用model里面控制器
 define('ONGQHTPL', '');      //强行后台模版
 define('ONGQQTPL', '');      //强行前台模版
-include ONGPHP.'ong.php';
+require ONGPHP.'ong.php';
