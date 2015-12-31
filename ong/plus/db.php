@@ -6,8 +6,8 @@ function db($table=null){
   
 		 global $CONN,$DBCO;                                 
 		 $qudong = "D".$CONN['qudong'];                      
-         $AYDBs = new $qudong($DBCO);
-		  return $AYDBs ->  shezhi($table); 
+         $AYDBs = new $qudong( $DBCO);
+		 return $AYDBs ->  shezhi( $table); 
 }
 
 class AYDB{
@@ -26,22 +26,26 @@ class AYDB{
 	var $bqdoq = null;
 	
 
-public function __construct($data=''){   
+public function __construct($data=''){
+
                 $this->DB = $data;	   
-                return $this;        
+                return $this;
+				
 }
 
-function limit($data=''){               
+function limit($data=''){  
+	
          if($data!='')
          $this->lismt=' LIMIT '.$this->zifuzhuan($data);
          return $this;
+
 }
 
-public function wherezuhe($data=''){  
+function wherezuhe($data=''){  
          $x='';
 	     if(is_array($data)){
-			     $zhsss = count($data);
-				 if($zhsss<1)return;
+			   $zhsss = count($data);
+			   if($zhsss < 1)return;
                foreach($data as $k=>$v){
 				    
 					 $k=$this->zifuzhuan($k);
@@ -105,7 +109,8 @@ public function wherezuhe($data=''){
 
 public function zuheset($data=''){ 
 
-		if(!is_array($data))return $data;
+		  if(!is_array($data))return $data;
+
 		  $chaxun = $this->tablejg[1];
 		  $x=array();
 		  
@@ -129,112 +134,127 @@ public function zuheset($data=''){
 }
 
 public function charuset($data=''){ 
+
 		if(!is_array($data))return null;
 		$chaxun = $this->tablejg[1];
-		  $xv =array();
-		 foreach($chaxun as $k=>$v){
+		$xv =array();
+		foreach($chaxun as $k=>$v){
 			if(isset($data[$k])&& $data[$k] !='' &&$v !='auto_increment'){
                  
                 $xv[]="'{$this->zifuzhuan($data[$k])}'";
 
 
 			 }else{
-				if($v =='auto_increment');//$xv[] ='NULL';
+				if($v =='auto_increment');
 				else $xv[] = "'".str_replace($k.'_','',$v)."'";
 			 }
 		}
 
 		$ndd=array();
-          foreach($this->tablejg[1] as $ttm=>$vvv){
+        foreach($this->tablejg[1] as $ttm=>$vvv){
 
 			  if($vvv !='auto_increment')$ndd[]=$ttm;
 		  
 		  
-		  }
+		}
 		
-		 return '('.implode(',',$ndd).')VALUES ('.implode(',',$xv).')';
+		return '('.implode(',',$ndd).')VALUES ('.implode(',',$xv).')';
   
 }
 
 function pqsql($DATA){
-	if(!is_array($DATA))return null;
-	  $qian = "INSERT INTO   `{$this->table}` ({$this->tablejg[0]})VALUES";
-	   $sql=$qian;
-	   $i=1;
-       foreach($DATA as $anyou){
-             
-     if($i%30==0){
-		 $sql=rtrim($sql,',');
-		 $sql.=';'.$qian.$anyou.',';
-	 }else
-	   $sql.=$anyou.',';
-	   $i++;
-	   }
 
-	   $sql =rtrim($sql,',');
+	      if(!is_array( $DATA))return null;
+	      $qian = "INSERT INTO   `{$this->table}` ({$this->tablejg[0]})VALUES";
+	      $sql=$qian;
+	      $i=1;
+          foreach($DATA as $anyou){
+
+                if( $i% 30 == 0){
+		               $sql=rtrim($sql,',');
+		               $sql.=';'.$qian.$anyou.',';
+	             }else $sql.=$anyou.',';
+	                  $i++;
+	     }
+
+	   $sql = rtrim( $sql , ',' );
 	  
-	   $this->qurey($sql,$moth='other');
+	   $this-> qurey( $sql , 'other');
 	   return true;  
         
 }
 function psql($data=''){
 	   
-         if(!is_array($data))return null;
+        if(!is_array($data))return null;
+
 		$chaxun = $this->tablejg[1];
-		  $xv =array();
-		 foreach($chaxun as $k=>$v){
+		$xv =array();
+
+		foreach($chaxun as $k=>$v){
+
 			if(isset($data[$k])&& $data[$k] !='' &&$v !='auto_increment'){
+
                 $xv[]="'{$this->zifuzhuan($data[$k])}'";
+
 			 }else{
+
 				if($v =='auto_increment')$xv[] ='NULL';
 				else $xv[] = "'".str_replace($k.'_','',$v)."'";
+
 			 }
 		}
-		 return '('.implode(',',$xv).')';
+
+		return '('.implode(',',$xv).')';
   
 }
 
 function order($data=''){
+
          if($data !='') $this->paixu = ' ORDER BY '.$data;
          return $this;
 }
 
 function where($data=''){
+
          if($data !='') $this->where = $this->wherezuhe($data);
          return $this;
 }
 
 function find($data=''){
-      if($data !=''){
+
+         if($data !=''){
 			  if(is_array($data))
 				 $this->where = $this->wherezuhe($data); 
 			  else{
-               $chaxun = $this->tablejg[1];
+                 $chaxun = $this->tablejg[1];
 			   
-               foreach($chaxun as $k =>$v){
-				   if($v=='auto_increment'){
-					$dataf[$k.' IN']=$data;break;
-                    }
-			    }
+                 foreach($chaxun as $k =>$v){
+
+				     if($v == 'auto_increment'){
+
+					  $dataf[$k.' IN']=$data;break;
+
+                     }
+			     } 
 			   
-              $this->where = $this->wherezuhe($dataf); 
+                $this->where = $this->wherezuhe($dataf); 
 			 }
 			
 		 }
 
-           return  $this->zhixing('find');
+        return  $this->zhixing('find');
 }
 
 function zhicha($datasl){
 
-         if($datasl!='')$this->tablejg['0'] =$datasl;
+          if($datasl!='')$this->tablejg['0'] =$datasl;
           return $this;
 }
 
 function total($data=''){
-	       if($data !='')
-           $this->where = $this->wherezuhe($data);
-           return  $this->zhixing('zongshu');
+	      if($data !='')
+          $this->where = $this->wherezuhe($data);
+          return  $this->zhixing('zongshu');
 }
 
 function select($data=''){ 
@@ -243,21 +263,22 @@ function select($data=''){
           return  $this->zhixing('select');
 }
 function qurey($data='',$moth='other'){ 
-        $this->sql=$data;
-		return  $this->zhixing($moth);
-}
+         $this->sql=$data;
+		 return  $this->zhixing($moth);
+} 
 function query($data='',$moth='other'){ 
-        $this->sql=$data;
-		return  $this->zhixing($moth);
+         $this->sql=$data;
+		 return  $this->zhixing($moth);
 }
 function update($data=''){
 	   
-	    if($data=='')return false;
-        $this->update = $this->zuheset($data);
-        return  $this->zhixing('xiugai');
+	     if($data=='')return false;
+         $this->update = $this->zuheset($data);
+         return  $this->zhixing('xiugai');
 }
 
 function delete($data=''){
+
          if($data !=''){
 			  if(is_array($data))
 				 $this->where = $this->wherezuhe($data); 
@@ -271,6 +292,7 @@ function delete($data=''){
               $this->where = $this->wherezuhe($dataf); 
 			 }
          }
+
          return  $this->zhixing('shanchu');
 }
 function biao(){
@@ -282,8 +304,9 @@ function insert($data=''){
 }
 
 function shezhi($data=''){
-           global $CONN;  
-		  
+
+         global $CONN;  
+
 		 if($CONN['duob']=='1')
 	     $suiji =array_rand($this->DB, 1);     
          else{
@@ -302,7 +325,7 @@ function shezhi($data=''){
 		if($data!=''){
          $qianzui = $this->DB[$suiji]['qian']; 
 		
-         $this->table = $qianzui.$data;//
+         $this->table = $qianzui.$data;
 		 
 		 $HASH = 'db/'.mima($this->DB[$suiji]['name'].$this->table);           
          global $Mem;
@@ -355,7 +378,7 @@ public  function zhixing($moth='',$sql=''){
                  
 	              $DATA = array();
               
-        if($moth=='scjg'){   //°ë±ß
+        if($moth=='scjg'){  
 		
                  $sql = "sp_columns '{$this->table}'";
 
@@ -375,7 +398,7 @@ public  function zhixing($moth='',$sql=''){
              
                    return  $DATA;
 
-        }else if($moth=='find'){   // ok
+        }else if($moth=='find'){   
                  $chaxun = $this->tablejg[0]; 
 				 
                  $sql = "SELECT TOP 1 $chaxun FROM  {$this->table} {$this->where} {$this->paixu} "; 
@@ -386,7 +409,7 @@ public  function zhixing($moth='',$sql=''){
                  $row=$qq->fetch(PDO::FETCH_ASSOC);
                  if(!$row)return false;
                  else return $row;        
-		}else if($moth=='select'){  //ok
+		}else if($moth=='select'){  
                  $chaxun = $this->tablejg[0]; 
 				
 				 if($this->lismt){
@@ -462,7 +485,7 @@ public  function zhixing($moth='',$sql=''){
 					   else return false;
 		        
 		 
-		 }else if($moth=='xiugai'){  //ok
+		 }else if($moth=='xiugai'){ 
                  
                  $sql = "UPDATE   `{$this->table}` SET {$this->update}  {$this->where}  {$this->lismt}";
 				  $sql = str_replace('`' , '' , $sql);
@@ -546,7 +569,7 @@ public function lianjie($data){
 		 $pdo = new PDO("mysql:host={$data['host']};port={$data['port']};dbname={$data['name']}", $data['user'], $data['pass'], array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES {$data['char']}") );
 	 
          } catch (PDOException $e) {
-           exit('db_error:' .$data['h']);
+           return ('db_error:' .$data['h']);
         }
            
 	 
@@ -685,7 +708,7 @@ class Dmysqli extends  AYDB{
 
 public function lianjie($data){ 
 		$mysqli = new mysqli($data['host'], $data['user'], $data['pass'],$data['name'],$data['port']);
-		if (!$mysqli) exit('db_error:' .$data['h']);
+		if (!$mysqli) return('db_error:' .$data['h']);
 		$mysqli->query("SET NAMES '".$data['char']."'");
 		$this->mysql = $mysqli; 
 		return $mysqli;
@@ -807,7 +830,7 @@ class Dmysql extends  AYDB{
 
 public function lianjie($data){
 				 $link = mysql_connect($data['host'].':'.$data['port'], $data['user'], $data['pass']);
-				 if (!$link) exit('db_error:' .$data['h']);
+				 if (!$link) return('db_error:' .$data['h']);
 				 mysql_query("SET NAMES '".$data['char']."'",$link); 
 				 mysql_select_db($data['name'],$link);               
 				 $this->mysql = $link; 
