@@ -121,7 +121,7 @@ public function f($key=Txpath){
 
 
 public function q($key){
-       $zzz = Txpath;
+       $zzz = $this->DB;
        $mydir = dir($zzz);
        while($file = $mydir -> read()){ 
 		if(($file!=".") and ($file!="..") and  strstr($file,"$key") ){
@@ -143,7 +143,7 @@ public function s($key, $value, $time=''){
 	   jianli( $pat);
 	   if(!$value)$value='0';
 	   if($value!=''){
-            if(!is_array($value))$value="'".$value."'";
+            if(!is_array($value))$value="'". zifuzhuan($value)."'";
          }
 
        x($pat,$value,$time);
