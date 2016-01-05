@@ -22,8 +22,7 @@ funciton        函数控制库 自定义函数          独立
 */
 
 
-plus(array('p','jiami','jianli','mima','shanchu','qcurl','qfopen','x','memcc','txtcc','db','isutf8','setsession','pagec','pinyin','ip','post','funciton'));
+plus(array('p','jiami','jianli','mima','shanchu','qcurl','qfopen','x','memcc','txtcc','db','isutf8','setsession','pagec','pinyin','ip','post','funciton','mongodb'));
 
 $Mem =new txtcc();
-
-p($Mem);
+p($Mem );

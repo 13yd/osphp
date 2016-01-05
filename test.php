@@ -6,6 +6,8 @@
  * Trademark  ONG
  * ******************************************
  */
+
+
 define('ONGHEAD','');  //强制输出头部
 define('ONGPHP', dirname(__FILE__).'/ong/');
 define("ONGTEMP", 'temp');   //缓存存放目录
