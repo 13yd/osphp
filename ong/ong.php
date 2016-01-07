@@ -64,7 +64,7 @@ if( defined( 'ONGDB') && ONGDB !='')  $DBLJI =  ONGPHP.ONGDB.".php";
 
                      $DBCO = include  $DBLJI;
 
-//error_reporting(!E_ALL);
+error_reporting(!E_ALL);
 function zifuzhuan($data){
 
       if(!get_magic_quotes_gpc()) return addslashes(str_replace(array('0xbf27','0xbf5c27'),"'",$data));else return $data;
@@ -182,7 +182,7 @@ define( 'ONGCMSNAME','OSphp');
 define( 'ONGCMSHTTP', 'http://www.ongsoft.com');
 
 
-define( 'ONGCMSVER', '0.4');
+define( 'ONGCMSVER', '0.5');
 
 
 define( 'WZHOST', 'http://'.$_SERVER ['HTTP_HOST'].$CONN['dir']);
@@ -204,4 +204,5 @@ define( 'DHTPL', $CONN['dir'].'tpl/admin/'.$CONN['htpl'].'/');
 
 
 if( defined( 'ONGTEMP')) define('Txpath',ONGPHP.ONGTEMP.'/'); else define('Txpath',ONGPHP.'temp/');
+
 if( defined( 'ONGNAME')) include ONGPHP.'moudl/'.ONGNAME.".php";
