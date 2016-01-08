@@ -22,17 +22,16 @@ funciton        函数控制库 自定义函数          独立
 */
 
 
-plus(array('p','jiami','jianli','mima','shanchu','qcurl','qfopen','x','memcc','txtcc','db','isutf8','setsession','pagec','pinyin','ip','post','funciton','tcpcc'));
+plus(array('p','jiami','jianli','mima','shanchu','qcurl','qfopen','x','memcc','txtcc','db','isutf8','setsession','pagec','pinyin','ip','post','funciton','tcpcc','mongodbcc'));
 
-$Mem =new tcpcc(array('127.0.0.1',11211));
+$Mem  = new mongodbcc("mongodb://localhost:27017",null,1);
+$f = $Mem ->ja('nw33/1/2',100);
 
-$ar = array();
-$i = 0;
-while($i< 20){
-$ar[$i] = $i +100001;
-$i++;
-}
-//$zhi =$Memd = $Mem ->s('2322',$ar);
-$Memd = $Mem ->g('2322');
+p($f);
 
-p($Memd );
+
+
+
+
+
+

@@ -5,8 +5,10 @@ class mongodbcc{
        var $data = false ;
 	   var $table = 'db.txtcc';
 	   var $db = '';
+	   var $fenjies = 1;
 
-public function __construct($servers,$table='db.txtcc'){
+/* $servers 连接信息 table 默认的数据库表 , fenjies = 1 key 分解数据库 */
+public function __construct($servers,$table='db.txtcc',$fenjies = 1){
                
 			   if(!$this->data){
 			      
@@ -14,10 +16,26 @@ public function __construct($servers,$table='db.txtcc'){
 				
 
 			   }
-            
-			   $this->table = $table;
+
+               $this->fenjies = $fenjies;
+
+			   if($table) $this->table = $table;
+			   else       $this->table = 'db.txtcc';
 			  
       }
+
+   public function fenjie($table,$ykey){
+
+	              if($this->fenjies == 1 && strpos( $ykey , '/') !== false ){
+
+					  $hash = explode('/',$ykey);
+					
+                      $this->table =  'O'.implode('.',$hash).'S';
+					     
+				   }
+
+              return  $this->table;
+  }
 
   public function fass($leix,$key='',$value='',$time=0){ 
 
@@ -33,7 +51,7 @@ public function __construct($servers,$table='db.txtcc'){
                         $bulk->insert([ '_id' => $key , 'key' => $nerong ,'time' => time(), 'xianshi' => $time ]);
 
 					    try {  
-                             $this->data->executeBulkWrite($this->table, $bulk);
+                             $this->data->executeBulkWrite($this->fenjie( $this->table, $ykey), $bulk);
 							 return true;
 
                         }catch (MongoDB\Driver\Exception\BulkWriteException $e){  
@@ -45,7 +63,7 @@ public function __construct($servers,$table='db.txtcc'){
                                           
                                     );
                               $writeConcern = new MongoDB\Driver\WriteConcern(MongoDB\Driver\WriteConcern::MAJORITY, 1000);
-                              $result = $this->data->executeBulkWrite($this->table, $bulk, $writeConcern);
+                              $result = $this->data->executeBulkWrite($this->fenjie( $this->table, $ykey), $bulk, $writeConcern);
                               return true;
                          }
 
@@ -61,7 +79,7 @@ public function __construct($servers,$table='db.txtcc'){
 								  $writeConcern = new MongoDB\Driver\WriteConcern(MongoDB\Driver\WriteConcern::MAJORITY, 1000);
 								  try {
  
-                                       $result = $this->data -> executeBulkWrite($this->table, $bulk, $writeConcern);
+                                       $result = $this->data -> executeBulkWrite($this->fenjie( $this->table, $ykey), $bulk, $writeConcern);
 									  
 
 								  }catch (MongoDB\Driver\Exception\BulkWriteException $e){ 
@@ -75,13 +93,13 @@ public function __construct($servers,$table='db.txtcc'){
 					 
 					  }else if( $leix == 'get'){
 
-						 $filter = ['_id' =>  $key];
+						 $filter  = ['_id' =>  $key];
                          $options = [   'projection' => ['key'=>1,'time'=>1,'xianshi'=> 1],
                                          'limit' => 1,
 	
                                    ];
                          $query = new MongoDB\Driver\Query($filter, $options);
-                         $cursor = $this->data->executeQuery($this->table, $query);
+                         $cursor = $this->data->executeQuery($this->fenjie( $this->table, $ykey), $query);
 						 $fanhui = $cursor->toArray();
 
 						 if($fanhui){
@@ -100,7 +118,7 @@ public function __construct($servers,$table='db.txtcc'){
 								  $writeConcern = new MongoDB\Driver\WriteConcern(MongoDB\Driver\WriteConcern::MAJORITY, 1000);
 								  try {
  
-                                       $result = $this->data -> executeBulkWrite($this->table, $bulk, $writeConcern);
+                                       $result = $this->data -> executeBulkWrite($this->fenjie( $this->table, $ykey), $bulk, $writeConcern);
 
 								  }catch (MongoDB\Driver\Exception\BulkWriteException $e){ 
 								 
@@ -133,7 +151,7 @@ public function __construct($servers,$table='db.txtcc'){
 	
                                    ];
                          $query = new MongoDB\Driver\Query($filter, $options);
-                         $cursor = $this->data->executeQuery($this->table, $query);
+                         $cursor = $this->data->executeQuery($this->fenjie( $this->table, $ykey), $query);
 						 $fanhui = $cursor->toArray();
                            
 						 if( $fanhui){
@@ -152,7 +170,7 @@ public function __construct($servers,$table='db.txtcc'){
 
 						  try {
  
-                                   $result = $this->data -> executeBulkWrite($this->table, $bulk, $writeConcern);
+                                   $result = $this->data -> executeBulkWrite($this->fenjie( $this->table, $ykey), $bulk, $writeConcern);
 
 							  }catch (MongoDB\Driver\Exception\BulkWriteException $e){ 
 								 
@@ -179,7 +197,7 @@ public function __construct($servers,$table='db.txtcc'){
 	
                                    ];
                          $query = new MongoDB\Driver\Query($filter, $options);
-                         $cursor = $this->data->executeQuery($this->table, $query);
+                         $cursor = $this->data->executeQuery($this->fenjie( $this->table, $ykey), $query);
 						 $fanhui = $cursor->toArray();
 						 if($fanhui){
 						 
@@ -215,7 +233,7 @@ public function __construct($servers,$table='db.txtcc'){
 	
                                    ];
                          $query = new MongoDB\Driver\Query($filter, $options);
-                         $cursor = $this->data->executeQuery($this->table, $query);
+                         $cursor = $this->data->executeQuery($this->fenjie( $this->table, $ykey), $query);
 						 $fanhui = $cursor->toArray();
 						 if($fanhui){
 						 
