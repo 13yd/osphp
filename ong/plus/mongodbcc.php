@@ -9,7 +9,9 @@ class mongodbcc{
 
 /* $servers 连接信息 table 默认的数据库表 , fenjies = 1 key 分解数据库 */
 public function __construct($servers,$table='db.txtcc',$fenjies = 1){
-               
+           
+			   if( ini_get('mongodb.debug') === false) return false;
+
 			   if(!$this->data){
 			      
 				$this->data = new MongoDB\Driver\Manager($servers);
