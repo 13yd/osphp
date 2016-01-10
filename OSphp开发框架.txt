@@ -37,6 +37,10 @@ ong/plus/sslpost.php       curl SSLPOST函数
 ong/plus/sslget.php        curl SSLGET函数
 ong/plus/txtcc.php         文本缓存KV系统
 ong/plus/x.php             专用写入数据函数
+ong/plus/tcpcc           tcp 通信memcached              独立
+ong/plus/mongodbcc       mongodb key-value 缓存系统     独立
+ong/plus/mongodb         还未开发完成 设计是 模拟sql 语句替换mysql 
+
 ong/temp/                  默认缓存存放位置
 ong/moudl/                 存放调用模版文件
 /tpl/                      风格等文件存放文件夹

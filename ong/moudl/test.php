@@ -19,15 +19,18 @@ sslget          ssl get 方法curl               独立
 sslpost         ssl post 方法curl              独立
 x               写入文件                       独立
 funciton        函数控制库 自定义函数          独立
+tcpcc           tcp 通信memcached              独立
+mongodbcc       mongodb key-value 缓存系统     独立
+mongodb         还未开发完成 设计是 模拟sql 语句替换mysql 
 */
 
 
 plus(array('p','jiami','jianli','mima','shanchu','qcurl','qfopen','x','memcc','txtcc','db','isutf8','setsession','pagec','pinyin','ip','post','funciton','tcpcc','mongodbcc'));
 
-$Mem  = new mongodbcc("mongodb://localhost:27017",null,1);
-$f = $Mem ->ja('nw33/1/2',100);
+$Mem  = new txtcc;
 
-p($f);
+
+p($Mem);
 
 
 
