@@ -31,7 +31,7 @@ public function __construct($servers,$table='db.txtcc',$fenjies = 1){
 	              if($this->fenjies == 1 && strpos( $ykey , '/') !== false ){
 
 					  $hash = explode('/',$ykey);
-					
+					  
                       $this->table =  'O'.implode('.',$hash).'S';
 					     
 				   }

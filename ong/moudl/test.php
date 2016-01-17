@@ -27,10 +27,10 @@ mongodb         还未开发完成 设计是 模拟sql 语句替换mysql
 
 plus(array('p','jiami','jianli','mima','shanchu','qcurl','qfopen','x','memcc','txtcc','db','isutf8','setsession','pagec','pinyin','ip','post','funciton','tcpcc','mongodbcc'));
 
-$Mem  = new txtcc;
-
-
-p($Mem);
+$Mem  = new txtcc();
+$zhis = $Mem ->ja(1);
+p($Mem,$zhis);
+					 
 
 
 

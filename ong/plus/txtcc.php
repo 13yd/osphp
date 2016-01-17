@@ -51,26 +51,23 @@ public function fs($key,$value='',$time=''){
 
 public function ja($key,$num=1){ 
           $pat = $this->DB.str_replace('../','',$key).'.php';
-	    
-       if(file_exists($pat)){
-		  
+	      jianli( $pat);
           $value = include $pat;
-          $value = $value*1+$num;
-		 
+          $value = (int)($value*1+$num);
           x($pat,$value);
           return $value;
-       }else return false;
+    
 }
 
 
 public function j($key,$num=1){ 
-       $pat = $this->DB.str_replace('../','',$key).'.php';
-       if(file_exists( $pat)){
+          $pat = $this->DB.str_replace('../','',$key).'.php';
+	      jianli( $pat);
           $value = include $pat;
-          $value = $value*1-$num;
+          $value = (int)($value*1-$num);
           x($pat,$value);
           return $value;
-       }else return false;
+      
 }
 
 public function g($key){ 
@@ -114,7 +111,8 @@ public function d($key){
         }else return false;
 }
 
-public function f($key=Txpath){ 
+public function f($key =''){
+	           if($key == '')  $key = $this->DB;
       
              return shanchu($key);
  }
@@ -149,6 +147,7 @@ public function s($key, $value, $time=''){
        x($pat,$value,$time);
        return $value;
 }
+
 
 
 
