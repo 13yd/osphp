@@ -64,7 +64,7 @@ if( defined( 'ONGDB') && ONGDB !='')  $DBLJI =  ONGPHP.ONGDB.".php";
 
                      $DBCO = include  $DBLJI;
 
-error_reporting(!E_ALL);
+//error_reporting(!E_ALL);
 function zifuzhuan($data){
 
       if(!get_magic_quotes_gpc()) return addslashes(str_replace(array('0xbf27','0xbf5c27'),"'",$data));else return $data;

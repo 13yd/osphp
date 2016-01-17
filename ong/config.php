@@ -9,9 +9,9 @@
 	  'port'=>'3306',
 	  'user'=>'root',
 	  'pass'=>'root',
-	  'name'=>'ku12',
+	  'name'=>'games',
 	  'char'=>'utf8',
-	  'qian'=>'os_'
+	  'qian'=>'ay_'
       )
 
 );

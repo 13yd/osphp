@@ -29,10 +29,6 @@ plus(array('p','jiami','jianli','mima','shanchu','qcurl','qfopen','x','memcc','t
 
 $Mem  = new txtcc();
 
-p($Mem);
-					 
-
-
 
 
 
