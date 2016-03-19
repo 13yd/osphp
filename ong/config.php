@@ -9,7 +9,7 @@
 	  'port'=>'3306',
 	  'user'=>'root',
 	  'pass'=>'root',
-	  'name'=>'games',
+	  'name'=>'qgou',
 	  'char'=>'utf8',
 	  'qian'=>'ay_'
       )
