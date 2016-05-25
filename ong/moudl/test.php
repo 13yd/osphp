@@ -27,37 +27,6 @@ mongodb         还未开发完成 设计是 模拟sql 语句替换mysql
 
 plus(array('p','jiami','jianli','mima','shanchu','qcurl','qfopen','x','memcc','txtcc','db','isutf8','setsession','pagec','pinyin','ip','post','funciton','tcpcc','mongodbcc'));
 
-$Mem  = new txtcc();
-$revers  = false;
-$lines = 1000;
-$filename = ONGPHP.'../Id.DB';
+$Mem  =  new txtcc;
 
-$handle = fopen($filename, "rb");
-$contents = fread($handle, filesize ($filename));
-fclose($handle);
-
-echo (base_convert($contents,10,16) );
-
-
-
-
-// read some data
-
-/*
- $this->fp 
-         
-        if($this->fp == NULL)
-        {
-            $szLocal = "OpenFileError";
-            return 1;
-        }
-         
-        @fseek($this->fp, 0, SEEK_SET);
-        $buf = fread($this->fp, 8);
-
-*/
-
-
-
-
-
+p($Mem);

@@ -11,37 +11,33 @@ function __construct($servers){
 }
 
 public function s($key,$value,$time=0){  
-       return $this -> md -> set( $key, $value, MEMCACHE_COMPRESSED, $time);
+
+       return $this -> md -> set( md5($key), $value, MEMCACHE_COMPRESSED, $time);
 }
+
 public function g($key){  
-       return $this -> md -> get( $key);
+       return $this -> md -> get( md5($key));
 }
-public function a( $key, $value, $time=0){
-       return $this -> md -> add( $key, $value, MEMCACHE_COMPRESSED, $time);
-}
+
 public function d( $key){  
-       return $this -> md -> delete($key); 
+       return $this -> md -> delete(md5($key)); 
 }
 public function f(){ 
        return $this -> md -> flush();
 }
-public function j( $key, $num=1){ 
-       return $this -> md -> decrement( $key, $num);
+public function j( $key, $num=1,$time =0){ 
+       return $this -> md -> decrement( md5($key), $num);
 }
 
-public function ja( $key, $num=1){
-       return $this -> md -> increment( $key, $num);
+public function ja( $key, $num=1,$time =0){
+       return $this -> md -> increment( md5($key), $num);
 }   
 
-public function fg($key,$time=''){
-	 return $this -> md -> get( $key);  
-	  
+
+public function gg($key){  
+       return $this -> md -> get( ($key));
 }
 
-public function fs($key,$value,$time=0){
-	    
-       return $this -> md -> set( $key, $value, MEMCACHE_COMPRESSED,$time);
-}
 
 
 }

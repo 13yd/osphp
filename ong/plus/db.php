@@ -2,6 +2,10 @@
 
 $PLUSdb = 'db';
 
+if( ! isset( $CONN['duob'])) $CONN['duob'] = 0;
+
+if( ! isset( $CONN['qxx']))  $CONN['qxx'] = 0;
+
 function db($table=null){
   
 		 global $CONN,$DBCO;                                 
@@ -12,18 +16,20 @@ function db($table=null){
 
 class AYDB{
 
-    var $DB=null; 
-	var $mysql=null; 
-	var $where=null; 
-	var $paixu =null;
-	var $lismt =null;
-	var $sql=null; 
-	var $table=null; 
-	var $tablejg=null; 
-	var $update= null;
-	var $charu=null;
-	var $bug=null;
-	var $bqdoq = null;
+		var $DB=null; 
+		var $mysql=null; 
+		var $where=null; 
+		var $paixu =null;
+		var $lismt =null;
+		var $sql=null; 
+		var $table=null; 
+		var $tablejg=null; 
+		var $update= null;
+		var $charu=null;
+		var $bug=null;
+		var $bqdoq = null;
+		var $SHIWU = 0;
+	    var $dqqz = null;
 	
 
 public function __construct($data=''){
@@ -78,9 +84,9 @@ function wherezuhe($data=''){
 					 }else if(strstr($k,'IN')){
 					  $k= trim(str_replace('IN','',$k));
                        if(is_array($v))
-					      $x.="`$k` IN(". implode(',',$v).")";
+					      $x.=" and `$k` IN(". implode(',',$v).")";
 					   else
-						  $x.="`$k` IN($v)";
+						  $x.=" and `$k` IN($v)";
                       }else if(strstr($k,'DAYD')){
 					    $k= trim(str_replace('DAYD','',$k));
 					    $x.=" and $k >= $v";
@@ -109,58 +115,50 @@ function wherezuhe($data=''){
 
 public function zuheset($data=''){ 
 
-		  if(!is_array($data))return $data;
+		        if(!is_array($data))return $data;
+                   $chaxun = $this->tablejg[1];
+		           $x=array();
+					foreach($chaxun as $k=>$v){
 
-		  $chaxun = $this->tablejg[1];
-		  $x=array();
-		  
-		  foreach($chaxun as $k=>$v){
-			 
-			if(isset($data[$k])&& $v !='auto_increment')
-                   $x[]="`$k` = '{$this->zifuzhuan($data[$k])}'";  
-				
-			else if(isset($data[$k.' +']))
-			
-			       $x[]="`$k` = $k + '{$this->zifuzhuan($data[$k.' +'])}'"; 
-			else if(isset($data[$k.' -']))
-			
-			       $x[]="`$k` = $k - '{$this->zifuzhuan($data[$k.' -'])}'"; 
-		 }
+						if(isset($data[$k])&& $v !='auto_increment')
+						   $x[]="`$k` = '{$this->zifuzhuan($data[$k])}'";  
+						else if(isset($data[$k.' +']))
+						   $x[]="`$k` = $k + '{$this->zifuzhuan($data[$k.' +'])}'"; 
+						else if(isset($data[$k.' -']))
+						   $x[]="`$k` = $k - '{$this->zifuzhuan($data[$k.' -'])}'"; 
+					}
 
-
-
-      
-		 return implode(',',$x);
+                return implode(',',$x);
 }
 
 public function charuset($data=''){ 
 
-		if(!is_array($data))return null;
-		$chaxun = $this->tablejg[1];
-		$xv =array();
-		foreach($chaxun as $k=>$v){
-			if(isset($data[$k])&& $data[$k] !='' &&$v !='auto_increment'){
-                 
-                $xv[]="'{$this->zifuzhuan($data[$k])}'";
+		          if( !is_array( $data))return null;
 
+                  $chaxun = $this->tablejg[1];
+		          $xv = array();
 
-			 }else{
-				if($v =='auto_increment');
-				else $xv[] = "'".str_replace($k.'_','',$v)."'";
-			 }
-		}
+		          foreach($chaxun as $k=>$v){
 
-		$ndd=array();
-        foreach($this->tablejg[1] as $ttm=>$vvv){
+                     if(isset($data[$k])&& $data[$k] !='' &&$v !='auto_increment')
+                          $xv[]="'{$this->zifuzhuan($data[$k])}'";
+                     else{
+				          if($v =='auto_increment');
+				          else $xv[] = "'".str_replace($k.'_','',$v)."'";
+			         }
+		           }
 
-			  if($vvv !='auto_increment')$ndd[]=$ttm;
-		  
-		  
-		}
+		          $ndd=array();
+
+                  foreach($this->tablejg[1] as $ttm=>$vvv){
+
+                          if($vvv !='auto_increment')$ndd[]=$ttm;
+		          }
 		
-		return '('.implode(',',$ndd).')VALUES ('.implode(',',$xv).')';
+		          return '('.implode(',',$ndd).')VALUES ('.implode(',',$xv).')';
   
 }
+
 
 function pqsql($DATA){
 
@@ -245,6 +243,14 @@ function find($data=''){
         return  $this->zhixing('find');
 }
 
+function setshiwu($wo = 0){
+
+	       $this->SHIWU = $wo;
+	       return $this;
+
+
+}
+
 function zhicha($datasl){
 
           if($datasl!='')$this->tablejg['0'] =$datasl;
@@ -306,23 +312,20 @@ function insert($data=''){
 function shezhi($data=''){
 
          global $CONN;  
+		 if($CONN['modb'] == '')
+				  $this->bqdoq = 'write';
+		 else $this->bqdoq = $CONN['modb']; 
 
 		 if($CONN['duob']=='1')
 	     $suiji =array_rand($this->DB, 1);     
-         else{
-			 
-			 if($CONN['modb']=='')
-				 $this->bqdoq = 'write';
-			
-			 else $this->bqdoq = $CONN['modb']; 
+         else $suiji = $this->bqdoq;
+		 
 
-			  $suiji = $this->bqdoq;
-		 }
+		 $this->dqqz = $suiji;
    
-  
          $this->lianjie($this->DB[$suiji]);   
        
-		if($data!=''){
+		 if($data!=''){
          $qianzui = $this->DB[$suiji]['qian']; 
 		
          $this->table = $qianzui.$data;
@@ -330,12 +333,13 @@ function shezhi($data=''){
 		 $HASH = 'db/'.mima($this->DB[$suiji]['name'].$this->table);           
          global $Mem;
          $huanc = $Mem->g($HASH);              
-		 if($huanc && $CONN['qxx'] != '1') 
+		 if($huanc && $CONN['qxx'] == 1) 
 			$this->tablejg =$huanc;             
 		   else{
+
 			  $qq= $this->zhixing('scjg');        
 			  $gege['0'] = $chaxun = implode(',',array_flip($qq));
-			  $gege['1'] = $qq;                                    
+			  $gege['1'] = $qq; 
 			  $this->tablejg =$gege;            
 			  $Mem->s($HASH,$gege);              
 			}
@@ -357,199 +361,228 @@ class Dmspdo extends  AYDB{
 
 public function lianjie($data){ 
 	
-	     try {
-    
-   
-		
-$pdo = new PDO("odbc:Driver={SQL Server};Server={$data['host']},{$data['port']};Database={$data['name']};",$data['user'],$data['pass']);
+	                try {  
+			 
+			          $pdo = new PDO("odbc:Driver={SQL Server};Server={$data['host']},{$data['port']};Database={$data['name']};",$data['user'],$data['pass']);
 	
-         } catch (PDOException $e) {
-           exit('db_error:' .$data['h'].$e);
-        }
-           
-	 
-	        $this->mysql = $pdo; 
+                    }catch (PDOException $e) {
+                     return('db_error:' .$data['h'].$e);
+                    } 
 				
-				 return $pdo;
+				  $this->mysql = $pdo; 
+				
+				  return $pdo;
 }
 
 
 public  function zhixing($moth='',$sql=''){ 
                  
 	              $DATA = array();
+				  global $CONN;  
               
-        if($moth=='scjg'){  
+                  if($moth=='scjg'){  
 		
-                 $sql = "sp_columns '{$this->table}'";
-
-
-		         $qq = $this->mysql->prepare($sql);
+                          $sql = "sp_columns '{$this->table}'";
+		                  $qq = $this->mysql->prepare($sql);
+				          $qq ->execute();
 				
-				 $qq ->execute();
-				
-                while($row=$qq->fetch(PDO::FETCH_ASSOC)){
+                          while($row=$qq->fetch(PDO::FETCH_ASSOC)){
 				  
-                    $DATA["{$row['COLUMN_NAME']}"]=$row['TYPE_NAME']!='int identity'?$row['COLUMN_NAME'].'_'.($row['COLUMN_DEF']==''?$row['NULLABLE']:$row['COLUMN_DEF']):'auto_increment';
- 
-					
-					
-				  }
-			   
-             
-                   return  $DATA;
+                             $DATA["{$row['COLUMN_NAME']}"]=$row['TYPE_NAME']!='int identity'?$row['COLUMN_NAME'].'_'.($row['COLUMN_DEF']==''?$row['NULLABLE']:$row['COLUMN_DEF']):'auto_increment';
+                           }
+						   
+						   return  $DATA;
 
-        }else if($moth=='find'){   
-                 $chaxun = $this->tablejg[0]; 
-				 
-                 $sql = "SELECT TOP 1 $chaxun FROM  {$this->table} {$this->where} {$this->paixu} "; 
-		   $sql = str_replace('`' , '' , $sql);
-				 $this->where = $this->paixu = null;
-			     $qq = $this->mysql->prepare($sql);
-				  $qq ->execute();
-                 $row=$qq->fetch(PDO::FETCH_ASSOC);
-                 if(!$row)return false;
-                 else return $row;        
-		}else if($moth=='select'){  
-                 $chaxun = $this->tablejg[0]; 
-				
-				 if($this->lismt){
-
-
-					 if( strpos( $this->lismt , ',') !== false){
-					 
-					           $this->lismt  = str_replace(array('LIMIT ','LIMIT') , '' ,$this->lismt );
-
-					           $feny = explode(',',$this->lismt);
-							
-							   if(!$this->paixu){
-								  $xx = explode(',',$chaxun);
-							        $this->paixu =  "ORDER BY ".$xx['0']." asc";
-							   
-							   }
-
-					   if($this->where){
+                  }else if($moth=='find'){  
 					  
-                           $sql ="SELECT $chaxun  from (  select ROW_NUMBER() over ({$this->paixu}) rownum,  $chaxun  from [{$this->table}] ) as yourselect {$this->where} and rownum between {$feny['0']} and {$feny['1']}  {$this->paixu} ";
-					  } else 
+							$chaxun = $this->tablejg[0]; 
 
-						   $sql ="SELECT $chaxun  from (  select ROW_NUMBER() over ({$this->paixu}) rownum,  $chaxun  from [{$this->table}] ) as yourselect where rownum between {$feny['0']} and {$feny['1']}  {$this->paixu} ";
-
-
-					
-					 }else{
-						 $this->lismt  = str_replace(array('LIMIT ','LIMIT') , '' ,$this->lismt );
-
-						 $sql = "SELECT TOP {$this->lismt} $chaxun FROM  {$this->table} {$this->where} {$this->paixu} "; 
-
-				   }
-				 }
-				 else
-                 $sql = "SELECT $chaxun FROM  {$this->table} {$this->where} {$this->paixu} {$this->lismt}";
-				 $sql = str_replace('`' , '' , $sql);
+							$sql = "SELECT TOP 1 $chaxun FROM  {$this->table} {$this->where} {$this->paixu} "; 
+							$sql = str_replace('`' , '' , $sql);
+							$this->where = $this->paixu = null;
+							$qq = $this->mysql->prepare($sql);
+							$qq ->execute();
+							$row=$qq->fetch(PDO::FETCH_ASSOC);
+							if(!$row)return false;
+							else return $row; 
+							
+		          }else if($moth=='select'){ 
+					  
+                           $chaxun = $this->tablejg[0]; 
 				
-				
-				 $this->where = $this->paixu = $this->lismt = null;
-			     $qq = $this->mysql->prepare($sql);
-				  $qq ->execute();
-                 $row=$qq->fetchAll(PDO::FETCH_ASSOC);
-                  if(!$row)return false; 
-                  else return $row;  
-		}else if($moth=='charu'){ 
-			$sql = "INSERT INTO   `{$this->table}` {$this->charu} ";
-            $sql = str_replace(array('`',"'(",")'") , array('','(',')') , $sql);
-		      
-				  $this->charu = null;
-	
-				  $this->lianjie($this->DB[$this->bqdoq]); 
-				  $qq = $this->mysql->prepare($sql);
+				           if($this->lismt){
 
-				  
-				  $mm = $qq ->execute();
-			
-				   
-				  return $mm;
+
+					          if( strpos( $this->lismt , ',') !== false){
+					 
+					                   $this->lismt  = str_replace(array('LIMIT ','LIMIT') , '' ,$this->lismt );
+
+					                   $feny = explode(',',$this->lismt);
+							
+							           if(!$this->paixu){
+
+								            $xx = explode(',',$chaxun);
+							                $this->paixu =  "ORDER BY ".$xx['0']." asc";
+							            }
+
+									  if($this->where){
+							  
+										   $sql ="SELECT $chaxun  from (  select ROW_NUMBER() over ({$this->paixu}) rownum,  $chaxun  from [{$this->table}] ) as yourselect {$this->where} and rownum between {$feny['0']} and {$feny['1']}  {$this->paixu} ";
+									  }else  
+										   $sql ="SELECT $chaxun  from (  select ROW_NUMBER() over ({$this->paixu}) rownum,  $chaxun  from [{$this->table}] ) as yourselect where rownum between {$feny['0']} and {$feny['1']}  {$this->paixu} ";
+
+					          }else{
+						        $this->lismt  = str_replace(array('LIMIT ','LIMIT') , '' ,$this->lismt );
+                                $sql = "SELECT TOP {$this->lismt} $chaxun FROM  {$this->table} {$this->where} {$this->paixu} "; 
+
+				              }
+				        } else $sql = "SELECT $chaxun FROM  {$this->table} {$this->where} {$this->paixu} {$this->lismt}";
+
+				          $sql = str_replace('`' , '' , $sql);
+				          $this->where = $this->paixu = $this->lismt = null;
+			              $qq = $this->mysql->prepare($sql);
+				          $qq ->execute();
+                          $row = $qq->fetchAll(PDO::FETCH_ASSOC);
+                          if(!$row)return false; 
+                          else return $row; 
+						  
+		      }else if($moth=='charu'){ 
+
+						$sql = "INSERT INTO   `{$this->table}` {$this->charu} ";
+						$sql = str_replace(array('`',"'(",")'") , array('','(',')') , $sql);
+						$this->charu = null;
+						if( $this->SHIWU == 1)return $sql.';@;';
+
+						if( $CONN['duob'] == '1' && $this->bqdoq !=  $this->dqqz) 
+						$this->lianjie($this->DB[$this->bqdoq]); 
+
+						$qq = $this->mysql->prepare($sql);
+						$mm = $qq ->execute();
+						return $mm;
 				 
-			 
-
-		}else if($moth=='shanchu'){
+			  }else if($moth=='shanchu'){
 			  
-			    $sql = "DELETE FROM  `{$this->table}` {$this->where}  ";
-				$sql = str_replace('`' , '' , $sql);
-              
-				 $this->where = $this->lismt = null;
+						$sql = "DELETE FROM  `{$this->table}` {$this->where}  ";
+						$sql = str_replace('`' , '' , $sql);
 
-                       $this->lianjie($this->DB[$this->bqdoq]);  
-					  $qq = $this->mysql->prepare($sql);
-				      $qq ->execute();
-                       if($qq ->rowCount())return true; 
-					   else return false;
+						$this->where = $this->lismt = null;
+
+						if( $this->SHIWU == 1)return $sql.';@;';
+
+						if( $CONN['duob'] == '1' && $this->bqdoq !=  $this->dqqz)
+						$this->lianjie($this->DB[$this->bqdoq]); 
+
+						$qq = $this->mysql->prepare($sql);
+						$qq ->execute();
+						if($qq ->rowCount())return true; 
+						else return false;
 		        
 		 
-		 }else if($moth=='xiugai'){ 
+		       }else if($moth=='xiugai'){ 
                  
-                 $sql = "UPDATE   `{$this->table}` SET {$this->update}  {$this->where}  {$this->lismt}";
-				  $sql = str_replace('`' , '' , $sql);
+						$sql = "UPDATE   `{$this->table}` SET {$this->update}  {$this->where}  {$this->lismt}";
+						$sql = str_replace('`' , '' , $sql);
 
-             
-			
-			     $this->where = $this->update = $this->lismt = null;
-			
-						  $this->lianjie($this->DB[$this->bqdoq]);   
-						   $qq = $this->mysql->prepare($sql);
-				          $qq ->execute();
-						 if($qq ->rowCount())return true; 
-						 else return false;
+						$this->where = $this->update = $this->lismt = null;
+
+						if( $this->SHIWU == 1)return $sql.';@;';
+
+						if( $CONN['duob'] == '1' && $this->bqdoq !=  $this->dqqz) 
+						$this->lianjie($this->DB[$this->bqdoq]); 
+						
+						$qq = $this->mysql->prepare($sql);
+						$qq ->execute();
+						if($qq ->rowCount())return true; 
+						else return false;
 				  
 
-		 }else if($moth=='zongshu'){
-						  $chaxun = $this->tablejg[0]; 
+		        }else if($moth=='zongshu'){
 
-						  $sql = "SELECT count(*) as count FROM  `{$this->table}` {$this->where} ";//sql
-						  
-						  $sql = str_replace('`' , '' , $sql);
-						
-						   $this->where = $this->paixu = $this->lismt = null;
-						  $qq = $this->mysql->prepare($sql);
-				          $qq ->execute();
-						  $row=$qq->fetch(PDO::FETCH_ASSOC);
-						
-						  return $row['count'];
+						$chaxun = $this->tablejg[0]; 
+
+						$sql = "SELECT count(*) as count FROM  `{$this->table}` {$this->where} ";//sql
+
+						$sql = str_replace('`' , '' , $sql);
+
+						$this->where = $this->paixu = $this->lismt = null;
+						$qq = $this->mysql->prepare($sql);
+						$qq ->execute();
+						$row=$qq->fetch(PDO::FETCH_ASSOC);
+
+						return $row['count'];
 		 
-		 }else if($moth=='other'){ 
+		        }else if($moth=='other'){ 
 
-                 
-				$this->lianjie($this->DB[$this->bqdoq]);  
-				$qq = $this->mysql->prepare($this->sql);
-			
-				$qq ->execute();
-				
-                $row=$qq->fetch(PDO::FETCH_ASSOC);
-                if(!$row)return false; 
-				else return $row;
+						if( $CONN['duob'] == '1' && $this->bqdoq !=  $this->dqqz) 
+						$this->lianjie($this->DB[$this->bqdoq]);
+						
+						$qq = $this->mysql->prepare($this->sql);
+						$qq ->execute();
+
+						$row=$qq->fetch(PDO::FETCH_ASSOC);
+						if(!$row)return false; 
+						else return $row;
                   
-		}else if($moth=='erwei'){
+		        }else if($moth=='erwei'){
 
-           
-				  $this->lianjie($this->DB[$this->bqdoq]);  
-				
-			     $qq = $this->mysql->prepare($this->sql);
-				  $qq ->execute();
-                 $row=$qq->fetchAll(PDO::FETCH_ASSOC);
-                  if(!$row)return false; 
-                  else return $row;  
-		}else if($moth=='accse'){
+						if( $CONN['duob'] == '1' && $this->bqdoq !=  $this->dqqz) 
+						$this->lianjie($this->DB[$this->bqdoq]);  
 
-			 $this->lianjie($this->DB[$this->bqdoq]);  
-				
-			     $qq = $this->mysql->prepare($this->sql);
-				  $row= $qq ->execute();
-                
-                  if(!$row)return false; 
-                  else return true;  
-		
-		
-		
-		}
+						$qq = $this->mysql->prepare($this->sql);
+						$qq ->execute();
+						$row=$qq->fetchAll(PDO::FETCH_ASSOC);
+						if(!$row)return false; 
+						else return $row; 
+				  
+		        }else if($moth=='accse'){
+             
+						if( $CONN['duob'] == '1' && $this->bqdoq !=  $this->dqqz) 
+						$this->lianjie($this->DB[$this->bqdoq]);  
+
+						$qq = $this->mysql->prepare($this->sql);
+						$row= $qq ->execute();
+
+						if(!$row)return false; 
+						else return true;
+
+		       }else if($moth=='shiwu'){
+				       
+					    if( $CONN['duob'] == '1' && $this->bqdoq !=  $this->dqqz) 
+						$this->lianjie($this->DB[$this->bqdoq]); 
+						
+						
+
+						try{
+							 $this-> mysql -> beginTransaction();
+
+                              $zhiss =  explode(';@;',$this->sql);
+
+							  foreach($zhiss as $tsss){
+
+									  if( $tsss == '')continue ;
+									  $woud = $this-> mysql ->exec($tsss.';');
+									  if(!$woud){
+										  $wodw = new txtcc;
+										  $wodw ->s('sqlerror/'.time().'_'.rand(1,9999999),$tsss.' @@@@@ '.$this->sql);
+										  $this-> mysql -> rollback(); 
+										  $this->sql = NULL;
+
+										  return false;
+									   }
+							  }
+
+				           return  $this->mysql->commit();
+
+                        }catch( PDOExecption $e ) { 
+
+					         $wodw = new txtcc;
+							 $wodw ->s('sqlerror/'.time().'_'.rand(1,9999999), $this->sql);
+				             $this-> mysql -> rollback(); 
+						     return false;
+
+                        }
+
+			   }
 	}
 
 
@@ -563,26 +596,28 @@ class Dpdo extends  AYDB{
 
 public function lianjie($data){ 
 	
-	     try {
-    
-   
-		 $pdo = new PDO("mysql:host={$data['host']};port={$data['port']};dbname={$data['name']}", $data['user'], $data['pass'], array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES {$data['char']}") );
-	 
-         } catch (PDOException $e) {
-           return ('db_error:' .$data['h']);
-        }
-           
-	 
-	        $this->mysql = $pdo; 
+				 try {
+			
+		   
+					  $pdo = new PDO("mysql:host={$data['host']};port={$data['port']};dbname={$data['name']}", $data['user'], $data['pass'], array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES {$data['char']}") );
+			 
+				  } catch (PDOException $e) {
+					  return ('db_error:' .$data['h']);
+				  }
+				    
+				 $this->mysql = $pdo; 
 				
 				 return $pdo;
 }
 
 public  function zhixing($moth='',$sql=''){ 
+
+	             global $CONN;
                  
-	              $DATA = array();
+	            $DATA = array();
               
-        if($moth=='scjg'){ 
+        if($moth=='scjg'){
+			
                  $sql = "desc `{$this->table}`";
 		         $qq = $this->mysql->prepare($sql);
 				 $qq ->execute();
@@ -591,34 +626,44 @@ public  function zhixing($moth='',$sql=''){
 					 $DATA["{$row['Field']}"]=$row['Extra']==''?$row['Field'].'_'.$row['Default']:$row['Extra'];
 				  }
 			      return  $DATA;
+
         }else if($moth=='find'){ 
+
                  $chaxun = $this->tablejg[0]; 
                  $sql = "SELECT $chaxun FROM  `{$this->table}` {$this->where} {$this->paixu} LIMIT 0 , 1"; 
 		      
 				 $this->where = $this->paixu = null;
+
 			     $qq = $this->mysql->prepare($sql);
 				  $qq ->execute();
                  $row=$qq->fetch(PDO::FETCH_ASSOC);
                  if(!$row)return false;
-                 else return $row;        
+                 else return $row; 
+				 
 		}else if($moth=='select'){
+
                  $chaxun = $this->tablejg[0]; 
                  $sql = "SELECT $chaxun FROM  `{$this->table}` {$this->where} {$this->paixu} {$this->lismt}";
 				 
 				 $this->where = $this->paixu = $this->lismt = null;
+
 			     $qq = $this->mysql->prepare($sql);
-				  $qq ->execute();
+				 $qq ->execute();
                  $row=$qq->fetchAll(PDO::FETCH_ASSOC);
-                  if(!$row)return false; 
-                  else return $row;  
+                 if(!$row)return false; 
+                 else return $row;  
+
 		}else if($moth=='charu'){ 
-			$sql = "INSERT INTO   `{$this->table}` {$this->charu}";
+
+			      $sql = "INSERT INTO   `{$this->table}` {$this->charu}";
 				  $this->charu = null;
-	
+				  if( $this->SHIWU == 1)return $sql.';@;';
+	              if( $CONN['duob'] == '1' && $this->bqdoq !=  $this->dqqz) 
 				  $this->lianjie($this->DB[$this->bqdoq]); 
 				  $qq = $this->mysql->prepare($sql);
+
 				  $qq ->execute();
-				   $id = $this->mysql->lastInsertId();
+				  $id = $this->mysql->lastInsertId();
 				  if($id)return $id ; 
 				  else return false;
 			 
@@ -628,7 +673,8 @@ public  function zhixing($moth='',$sql=''){
 			    $sql = "DELETE FROM  `{$this->table}` {$this->where}  {$this->lismt}";
 				
 				 $this->where = $this->lismt = null;
-
+				 if( $this->SHIWU == 1)return $sql.';@;';
+                       if( $CONN['duob'] == '1' && $this->bqdoq !=  $this->dqqz) 
                        $this->lianjie($this->DB[$this->bqdoq]);  
 					  $qq = $this->mysql->prepare($sql);
 				      $qq ->execute();
@@ -641,7 +687,8 @@ public  function zhixing($moth='',$sql=''){
                  $sql = "UPDATE   `{$this->table}` SET {$this->update}  {$this->where}  {$this->lismt}";
                 
 			     $this->where = $this->update = $this->lismt = null;
-			
+				 if( $this->SHIWU == 1)return $sql.';@;';
+			              if( $CONN['duob'] == '1' && $this->bqdoq !=  $this->dqqz) 
 						  $this->lianjie($this->DB[$this->bqdoq]);   
 						   $qq = $this->mysql->prepare($sql);
 				          $qq ->execute();
@@ -662,7 +709,7 @@ public  function zhixing($moth='',$sql=''){
 		 
 		 }else if($moth=='other'){ 
 
-                 
+                 if( $CONN['duob'] == '1' && $this->bqdoq !=  $this->dqqz) 
 				$this->lianjie($this->DB[$this->bqdoq]);  
 				$qq = $this->mysql->prepare($this->sql);
 			
@@ -674,7 +721,7 @@ public  function zhixing($moth='',$sql=''){
                   
 		}else if($moth=='erwei'){
 
-           
+                  if( $CONN['duob'] == '1' && $this->bqdoq !=  $this->dqqz) 
 				  $this->lianjie($this->DB[$this->bqdoq]);  
 				
 			     $qq = $this->mysql->prepare($this->sql);
@@ -683,8 +730,9 @@ public  function zhixing($moth='',$sql=''){
                   if(!$row)return false; 
                   else return $row;  
 		}else if($moth=='accse'){
-
-			 $this->lianjie($this->DB[$this->bqdoq]);  
+                
+				if( $CONN['duob'] == '1' && $this->bqdoq !=  $this->dqqz) 
+			    $this->lianjie($this->DB[$this->bqdoq]);  
 				
 			     $qq = $this->mysql->prepare($this->sql);
 				  $row= $qq ->execute();
@@ -695,7 +743,43 @@ public  function zhixing($moth='',$sql=''){
 		
 		
 		
-		}
+		}else if($moth=='shiwu'){
+				       
+					    if( $CONN['duob'] == '1' && $this->bqdoq !=  $this->dqqz) 
+						$this->lianjie($this->DB[$this->bqdoq]);  
+						$this->mysql->setAttribute(PDO::ATTR_AUTOCOMMIT, 0);
+
+						try{
+
+				              $this->mysql->beginTransaction();
+                              $zhiss =  explode(';@;',$this->sql);
+
+							  foreach($zhiss as $tsss){
+
+									  if( $tsss == '')continue ;
+									  $woud = $this-> mysql ->exec($tsss.';');
+									  if(!$woud){
+										  $wodw = new txtcc;
+										  $wodw ->s('sqlerror/'.time().'_'.rand(1,9999999),$tsss.' @@@@@ '.$this->sql);
+										  $this-> mysql -> rollback(); 
+										  $this->sql = NULL;
+
+										  return false;
+									   }
+							  }
+
+				           return  $this->mysql->commit();
+
+                        }catch( PDOExecption $e ) { 
+
+					         $wodw = new txtcc;
+							 $wodw ->s('sqlerror/'.time().'_'.rand(1,9999999), $this->sql);
+				             $this-> mysql -> rollback(); 
+						     return false;
+
+                        }
+
+			   }
 	}
 
 
@@ -715,6 +799,9 @@ public function lianjie($data){
 }
 
 public  function zhixing($moth='',$sql=''){ 
+
+	              
+				  global $CONN;
                  
 	              $DATA = array();
          
@@ -741,9 +828,13 @@ public  function zhixing($moth='',$sql=''){
                  if($result->num_rows==0)return false;   else return $result->fetch_all(true);
                
 		}else if($moth=='charu'){ 
-			$sql = "INSERT INTO   `{$this->table}` {$this->charu}";
-			$this->charu = null;
-			
+
+			     $sql = "INSERT INTO   `{$this->table}` {$this->charu}";
+			     $this->charu = null;
+
+				 if( $this->SHIWU == 1)return $sql.';@;';
+			      
+				  if( $CONN['duob'] == '1' && $this->bqdoq !=  $this->dqqz) 
 				  $this->lianjie($this->DB[$this->bqdoq]);   
 			
 				  $this->mysql->query($sql);
@@ -757,7 +848,9 @@ public  function zhixing($moth='',$sql=''){
 			
 			 $sql = "DELETE FROM  `{$this->table}` {$this->where}  {$this->lismt}";
 			 $this->where = $this->lismt = null;
-           
+
+			 if( $this->SHIWU == 1)return $sql.';@;';
+                       if( $CONN['duob'] == '1' && $this->bqdoq !=  $this->dqqz) 
                        $this->lianjie($this->DB[$this->bqdoq]);    
 					  
 					   $this->mysql->query($sql);
@@ -768,7 +861,11 @@ public  function zhixing($moth='',$sql=''){
 		 }else if($moth=='xiugai'){ 
 			    $sql = "UPDATE   `{$this->table}` SET {$this->update}  {$this->where}  {$this->lismt}";
                 $this->where = $this->lismt =$this->update = null;
-				 
+
+
+				if( $this->SHIWU == 1)return $sql.';@;';
+				           
+						  if( $CONN['duob'] == '1' && $this->bqdoq !=  $this->dqqz) 
 						  $this->lianjie($this->DB[$this->bqdoq]);    
 						  $this->mysql->query($sql);
 						  if($this->mysql->affected_rows)return true; 
@@ -784,7 +881,8 @@ public  function zhixing($moth='',$sql=''){
 						  return $data['count'];
 		 
 		 }else if($moth=='other'){
-                 
+                     
+					 if( $CONN['duob'] == '1' && $this->bqdoq !=  $this->dqqz) 
 					 $this->lianjie($this->DB[$this->bqdoq]);  
 			
                      $result = $this->mysql->query($this->sql);
@@ -792,6 +890,8 @@ public  function zhixing($moth='',$sql=''){
 					 else return $result->fetch_array(true);        
                   
 		}else if($moth=='erwei'){ 
+
+			     if( $CONN['duob'] == '1' && $this->bqdoq !=  $this->dqqz) 
                  $this->lianjie($this->DB[$this->bqdoq]);  
 			
                   $result = $this->mysql->query($this->sql);
@@ -799,7 +899,8 @@ public  function zhixing($moth='',$sql=''){
                  if($result->num_rows==0)return false;  else return $result->fetch_all(true); 
                
 		}else if($moth=='accse'){
-
+                     
+					 if( $CONN['duob'] == '1' && $this->bqdoq !=  $this->dqqz) 
 			         $this->lianjie($this->DB[$this->bqdoq]);  
 			
                      $result = $this->mysql->query($this->sql);
@@ -808,17 +909,55 @@ public  function zhixing($moth='',$sql=''){
 		
 		
 		
+		}else if($moth=='shiwu'){
+			        
+					if( $CONN['duob'] == '1' && $this->bqdoq !=  $this->dqqz) 
+			        $this->lianjie($this->DB[$this->bqdoq]); 
+
+             
+					$this-> mysql -> query("CREATE TABLE Language LIKE CountryLanguage");
+					$this-> mysql -> autocommit(FALSE);
+
+					try{
+
+
+						   $zhiss =  explode(';@;',$this->sql);
+
+							  foreach($zhiss as $tsss){
+
+									  if( $tsss == '')continue ;
+									  $woud = $this-> mysql ->query($tsss.';');
+									  if(!$woud){
+										  $wodw = new txtcc;
+										  $wodw ->s('sqlerror/'.time().'_'.rand(1,9999999),$tsss.' @@@@@ '.$this->sql);
+										  $this-> mysql -> rollback(); 
+										  $this->sql = NULL;
+
+										  return false;
+									   }
+							  }
+
+				            $fanhui = $this->mysql->commit();
+
+						    $this-> mysql -> query("DROP TABLE Language");
+
+						    return  $fanhui;
+
+
+
+					}catch( PDOExecption $e ) { 
+
+					         $wodw = new txtcc;
+							 $wodw ->s('sqlerror/'.time().'_'.rand(1,9999999), $this->sql);
+				             $this-> mysql -> rollback(); 
+						     return false;
+                     }
+		
+		
+		
+		
+		
 		}
-
-
-
-
-
-
-
-
-
-
 
 
 	}
@@ -870,8 +1009,10 @@ public  function zhixing($moth='',$sql=''){
          }else if($moth=='shanchu'){
 			 $sql = "DELETE FROM  `{$this->table}` {$this->where}  {$this->lismt}";
 			 $this->lismt=  $this->where=null;
-               
 
+			 if( $this->SHIWU == 1)return $sql.';@;';
+               
+                         if( $CONN['duob'] == '1' && $this->bqdoq !=  $this->dqqz)
 					   $this->lianjie($this->DB[$this->bqdoq]);   
 					   
 					   $result = mysql_query($sql,$this->mysql);
@@ -882,7 +1023,11 @@ public  function zhixing($moth='',$sql=''){
 		 }else if($moth=='xiugai'){ 
 			  $sql = "UPDATE   `{$this->table}` SET {$this->update}  {$this->where}  {$this->lismt}";
 			   $this->update = $this->lismt=  $this->where=null;
-             
+
+
+			   if( $this->SHIWU == 1)return $sql.';@;';
+
+             if( $CONN['duob'] == '1' && $this->bqdoq !=  $this->dqqz)
 			  $this->lianjie($this->DB[$this->bqdoq]);   
 			 
               
@@ -894,7 +1039,9 @@ public  function zhixing($moth='',$sql=''){
 		 }else if($moth=='charu'){ 
 			 $sql = "INSERT INTO   `{$this->table}` {$this->charu}";
            $this->charu=null;
-          
+
+               if( $this->SHIWU == 1)return $sql.';@;';
+          if( $CONN['duob'] == '1' && $this->bqdoq !=  $this->dqqz)
             $this->lianjie($this->DB[$this->bqdoq]); 
             
             $result = mysql_query($sql,$this->mysql);
@@ -912,7 +1059,7 @@ public  function zhixing($moth='',$sql=''){
 			  return $xxx['count'];
 		 }else if($moth=='other'){
 
-       
+                 if( $CONN['duob'] == '1' && $this->bqdoq !=  $this->dqqz)
 				 $this->lianjie($this->DB[$this->bqdoq]);  
 		
               $result=mysql_query($this->sql,$this->mysql);
@@ -920,7 +1067,8 @@ public  function zhixing($moth='',$sql=''){
               else return mysql_fetch_assoc($result);
              
 		}else if($moth=='erwei'){ 
-
+            
+			   if( $CONN['duob'] == '1' && $this->bqdoq !=  $this->dqqz)
                $this->lianjie($this->DB[$this->bqdoq]);  
 		
               $result=mysql_query($this->sql,$this->mysql);
@@ -932,12 +1080,67 @@ public  function zhixing($moth='',$sql=''){
               }
 
          }else if($moth=='accse'){
+
+			 if( $CONN['duob'] == '1' && $this->bqdoq !=  $this->dqqz)
 		      $this->lianjie($this->DB[$this->bqdoq]);  
 		
               $result=mysql_query($this->sql,$this->mysql);
 
               if(mysql_num_rows($result)==0)return false;
 			  else return true;
+		 
+		 }else if($moth=='shiwu'){
+
+			      if( $CONN['duob'] == '1' && $this->bqdoq !=  $this->dqqz)
+		           $this->lianjie($this->DB[$this->bqdoq]);
+				   
+				   mysql_query($this->sql,"BEGIN"); 
+
+ 
+
+
+				  try{
+				  
+
+				              $zhiss =  explode(';@;',$this->sql);
+
+							  foreach($zhiss as $tsss){
+
+									  if( $tsss == '')continue ;
+									  $woud = mysql_query($this->sql,$tsss.';');
+									  if(!$woud){
+										  $wodw = new txtcc;
+										  $wodw ->s('sqlerror/'.time().'_'.rand(1,9999999),$tsss.' @@@@@ '.$this->sql);
+										    mysql_query($this->sql,"ROLLBACK");
+										 
+										    mysql_query($this->sql,"END"); 
+
+										  $this->sql = NULL;
+
+										  return false;
+									   }
+							  }
+
+							  $woud = mysql_query($this->sql,"COMMIT");
+
+							  mysql_query($this->sql,"END"); 
+
+							  return $woud;
+
+				  
+				  
+				  }catch( PDOExecption $e ) { 
+
+					         $wodw = new txtcc;
+							 $wodw ->s('sqlerror/'.time().'_'.rand(1,9999999), $this->sql);
+
+				             mysql_query($this->sql,"ROLLBACK" );
+							 mysql_query($this->sql,"END"); 
+						     return false;
+
+                        }
+		 
+		 
 		 
 		 }
 
@@ -946,7 +1149,6 @@ public  function zhixing($moth='',$sql=''){
 
 
 
-
-  }
+    }
 
 }

@@ -31,7 +31,7 @@ request_uri();
 $URI = ltrim(strtolower( urldecode( trim($_SERVER["REQUEST_URI"]))),'/'); 
 
 
-$ZHURU = array( '<', '>', '..', '\'', '(', ')' );
+$ZHURU = array( '<', '>', '..', '\'', '(', ')','*','[' ,']','{','}','"');
 
 
 
@@ -64,22 +64,16 @@ if( defined( 'ONGDB') && ONGDB !='')  $DBLJI =  ONGPHP.ONGDB.".php";
 
                      $DBCO = include  $DBLJI;
 
-//error_reporting(!E_ALL);
+error_reporting(!E_ALL);
 function zifuzhuan($data){
 
       if(!get_magic_quotes_gpc()) return addslashes(str_replace(array('0xbf27','0xbf5c27'),"'",$data));else return $data;
 }
 
 
-if($_POST){
-
-	foreach($_POST as  $k => $v){ 
-
-		 if(strstr(strtolower($k),$DBCO[$CONN['modb']]['qian'])  ||  strstr(strtolower($v),$DBCO[$CONN['modb']]['qian']) )exit('feifa');
-	
-	
-	}
-
+if( $_POST ){
+    
+     if( strstr( strtolower( json_encode( $_POST) ), $DBCO[$CONN['modb']]['qian']) ) exit('feifa');
 
 }
 
@@ -197,7 +191,7 @@ define( 'ONGCMSNAME','OSphp');
 define( 'ONGCMSHTTP', 'http://www.ongsoft.com');
 
 
-define( 'ONGCMSVER', '0.5');
+define( 'ONGCMSVER', '0.8');
 
 
 define( 'WZHOST', 'http://'.$_SERVER ['HTTP_HOST'].$CONN['dir']);

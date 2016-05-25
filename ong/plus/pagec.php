@@ -1,13 +1,13 @@
 <?php //
 $PLUSpagec = 'pagec';
+
 function pagec($xsuu,$page_size=10,$nums,$sub_pages = 5,$page,$qianzui,$houzui=''){  
             
          $xx = ceil($nums/$page_size);
         
-	
-       $subPages=new SubPages($xsuu,$page_size,$nums,$page,$sub_pages,$qianzui,$houzui,2);
-
-	   return ($subPages->subPageCss2());
+	     if( $page > $xx) return '';
+         $subPages = new SubPages( $xsuu, $page_size, $nums, $page, $sub_pages, $qianzui, $houzui, 2);
+         return ( $subPages -> subPageCss2());
 }
 
 class SubPages{     
