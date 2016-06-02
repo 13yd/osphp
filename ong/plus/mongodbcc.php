@@ -1,330 +1,265 @@
 <?php //
+
 $PLUSmongodbcc = 'mongodbcc';
+
 class mongodbcc{
 
        var $data = false ;
-	   var $table = 'db.txtcc';
-	   var $db = '';
-	   var $fenjies = 1;
+       var $table = 'db.txtcc';
+       var $db = '';
+       var $fenjies = 1;
 
 /* $servers 连接信息 table 默认的数据库表 , fenjies = 1 key 分解数据库 */
-public function __construct($servers,$table='db.txtcc',$fenjies = 1){
+    public function __construct($servers,$table='db.txtcc',$fenjies = 1){
            
-			   if( ini_get('mongodb.debug') === false) return false;
+           if( ini_get( 'mongodb.debug' ) === false ) return false;
+           if( ! $this -> data) $this -> data = new MongoDB\Driver\Manager( $servers);
+           $this -> fenjies = $fenjies;
+           if($table) $this -> table = $table;
+           else       $this -> table = 'db.txtcc';
+    }
 
-			   if(!$this->data){
-			      
-				$this->data = new MongoDB\Driver\Manager($servers);
-				
+    public function fenjie($table,$ykey){
 
-			   }
+           if( $this -> fenjies == 1 && strpos( $ykey , '/') !== false ){
 
-               $this->fenjies = $fenjies;
+               $hash = explode('/',$ykey);
+               $this -> table =  'O'. implode( '.' , $hash). 'S';
+                         
+           }
 
-			   if($table) $this->table = $table;
-			   else       $this->table = 'db.txtcc';
-			  
-      }
+           return  $this->table;
+    }
 
-   public function fenjie($table,$ykey){
 
-	              if($this->fenjies == 1 && strpos( $ykey , '/') !== false ){
+    public function fass( $leix, $key = '', $value = '', $time = 0){ 
 
-					  $hash = explode('/',$ykey);
-					  
-                      $this->table =  'O'.implode('.',$hash).'S';
-					     
-				   }
+                    $ykey   = $key;
+                    $nerong = serialize( $value);
+                    $key    = md5( $key);
+                    $wode   =  strlen( $nerong);
 
-              return  $this->table;
-  }
+                    if( $leix == 'add' || $leix == 'set'){
+                      
+                        $bulk = new MongoDB\Driver\BulkWrite;
 
-  public function fass($leix,$key='',$value='',$time=0){ 
+                        $bulk -> insert ( array( '_id' => $key , 'key' => $nerong ,'time' => time(), 'xianshi' => $time ));
 
-	                 $ykey   = $key;
-	                 $nerong = serialize($value);
-                     $key    = md5($key);
-					 $wode   =  strlen( $nerong);
+                        try {  
 
-					 if( $leix == 'add' || $leix == 'set'){
-					  
-					    $bulk = new MongoDB\Driver\BulkWrite;
+                             $this -> data -> executeBulkWrite( $this-> fenjie ( $this -> table, $ykey), $bulk);
 
-                        $bulk->insert([ '_id' => $key , 'key' => $nerong ,'time' => time(), 'xianshi' => $time ]);
+                             return true;
 
-					    try {  
-                             $this->data->executeBulkWrite($this->fenjie( $this->table, $ykey), $bulk);
-							 return true;
+                        }catch ( MongoDB\Driver\Exception\BulkWriteException  $e){  
 
-                        }catch (MongoDB\Driver\Exception\BulkWriteException $e){  
+                             $bulk = new MongoDB\Driver\BulkWrite;
 
-                              $bulk = new MongoDB\Driver\BulkWrite;
-
-                              $bulk->update(  ['_id' => $key],
-                                           ['$set' => ['key' => $nerong,'time' =>time(),'xianshi' => $time]]
+                             $bulk->update(  array( '_id' => $key ),
+                                             array('$set' => array( 'key' => $nerong,'time' =>time(),'xianshi' => $time ))
                                           
-                                    );
-                              $writeConcern = new MongoDB\Driver\WriteConcern(MongoDB\Driver\WriteConcern::MAJORITY, 1000);
-                              $result = $this->data->executeBulkWrite($this->fenjie( $this->table, $ykey), $bulk, $writeConcern);
-                              return true;
+                             );
+
+                             $writeConcern = new MongoDB\Driver\WriteConcern(MongoDB\Driver\WriteConcern::MAJORITY, 1000);
+                             $result = $this-> data -> executeBulkWrite ( $this -> fenjie( $this -> table, $ykey), $bulk, $writeConcern);
+                             return true;
                          }
 
+                    }else if( $leix == 'delete'){
 
-						     
-		          
+                             $bulk = new MongoDB\Driver\BulkWrite;
+                             $bulk-> delete(array( '_id' => $key), array( 'limit' => 1));
+                             $writeConcern = new MongoDB\Driver\WriteConcern(MongoDB\Driver\WriteConcern::MAJORITY, 1000);
+                             try {
 
+                                   $result = $this-> data -> executeBulkWrite( $this-> fenjie( $this -> table, $ykey), $bulk, $writeConcern);
 
-					 }else if($leix == 'delete'){
-
-                                  $bulk = new MongoDB\Driver\BulkWrite;
-                                  $bulk->delete(['_id' => $key], ['limit' => 1]);
-								  $writeConcern = new MongoDB\Driver\WriteConcern(MongoDB\Driver\WriteConcern::MAJORITY, 1000);
-								  try {
- 
-                                       $result = $this->data -> executeBulkWrite($this->fenjie( $this->table, $ykey), $bulk, $writeConcern);
-									  
-
-								  }catch (MongoDB\Driver\Exception\BulkWriteException $e){ 
-								     
-								  }
-
-							     return true;
-							
-						
-					 
-					 
-					  }else if( $leix == 'get'){
-
-						 $filter  = ['_id' =>  $key];
-                         $options = [   'projection' => ['key'=>1,'time'=>1,'xianshi'=> 1],
-                                         'limit' => 1,
-	
-                                   ];
-                         $query = new MongoDB\Driver\Query($filter, $options);
-                         $cursor = $this->data->executeQuery($this->fenjie( $this->table, $ykey), $query);
-						 $fanhui = $cursor->toArray();
-
-						 if($fanhui){
-							
-                             
-							 if( $fanhui['0']->xianshi  == 0)
-
-							     return  unserialize($fanhui['0']->key);
-							 
-							 else if( $fanhui['0']->xianshi + $fanhui['0']->time >= time())
-								 return  unserialize($fanhui['0']->key);
-							 else{
-
-							      $bulk = new MongoDB\Driver\BulkWrite;
-                                  $bulk->delete(['_id' => $key], ['limit' => 1]);
-								  $writeConcern = new MongoDB\Driver\WriteConcern(MongoDB\Driver\WriteConcern::MAJORITY, 1000);
-								  try {
- 
-                                       $result = $this->data -> executeBulkWrite($this->fenjie( $this->table, $ykey), $bulk, $writeConcern);
-
-								  }catch (MongoDB\Driver\Exception\BulkWriteException $e){ 
-								 
-								  }
-
-							     return false;
-							 }
-
-
-						    
-						 
-						 }else return false;
-					
-  
-					
-						 	
-                    
-						
-
-						
-						
-					 
-					 
-					 }else if( $leix == 'flush_all'){
-						 
-						  
-						 $filter = [];
-                         $options = [   'projection' => ['key'=>1,'time'=>1,'xianshi'=> 1],
-                                         'limit' => 1000,
-	
-                                   ];
-                         $query = new MongoDB\Driver\Query($filter, $options);
-                         $cursor = $this->data->executeQuery($this->fenjie( $this->table, $ykey), $query);
-						 $fanhui = $cursor->toArray();
-                           
-						 if( $fanhui){
-
-							 $bulk = new MongoDB\Driver\BulkWrite;
+                              }catch ( MongoDB\Driver\Exception\BulkWriteException $e){ 
                                  
-								  
+                              }
 
-						 foreach($fanhui as $woqu){
-						
-							  $bulk->delete( ['_id'=> $woqu ->_id],['limit' => 1]);
-						      
-						  }
+                             return true;
 
-						  $writeConcern = new MongoDB\Driver\WriteConcern(MongoDB\Driver\WriteConcern::MAJORITY, 1000);
+                    }else if($leix == 'get'){
 
-						  try {
- 
-                                   $result = $this->data -> executeBulkWrite($this->fenjie( $this->table, $ykey), $bulk, $writeConcern);
+                             $filter  = array ( '_id' =>  $key );
+                             $options = array ( 'projection' => array ('key'=>1,'time'=>1,'xianshi'=> 1),
+                                                'limit' => 1,
+                                        );
+                             $query = new MongoDB\Driver\Query( $filter, $options);
+                             $cursor = $this -> data -> executeQuery ( $this-> fenjie( $this->table, $ykey), $query);
+                             $fanhui = $cursor -> toArray();
 
-							  }catch (MongoDB\Driver\Exception\BulkWriteException $e){ 
-								 
-							}
+                             if( $fanhui ){
+                                
+                                 if( $fanhui['0'] -> xianshi  == 0)
 
+                                      return  unserialize( $fanhui['0'] -> key);
+                                 else if( $fanhui['0'] -> xianshi + $fanhui['0']-> time >= time())
+                                      return  unserialize( $fanhui['0'] -> key);
+                                 else{
 
-                            $this ->f();
+                                      $bulk = new MongoDB\Driver\BulkWrite;
+                                      $bulk -> delete( array( '_id' => $key ), array( 'limit' => 1) );
+                                      $writeConcern = new MongoDB\Driver\WriteConcern(MongoDB\Driver\WriteConcern::MAJORITY, 1000);
+                                      try {
+     
+                                           $result = $this-> data -> executeBulkWrite( $this->fenjie ( $this->table , $ykey), $bulk, $writeConcern);
 
-						 }
-						 
-			
+                                      }catch ( MongoDB\Driver\Exception\BulkWriteException $e){ 
+                                     
+                                      }
 
-                          return true;
-					 
-					 
-					 }else if( $leix == 'incr'){
+                                      return false;
+                                 }
+                             
+                             }else return false;
+                     
+                    }else if($leix == 'flush_all'){
+                         
+                             $filter = array();
+                             $options = array( 'projection' => array( 'key'=>1,'time'=>1,'xianshi'=> 1 ),
+                                             'limit' => 1000,
+                                        );
+                             $query = new MongoDB\Driver\Query( $filter, $options);
+                             $cursor = $this -> data -> executeQuery( $this -> fenjie( $this->table, $ykey), $query);
+                             $fanhui = $cursor -> toArray();
+                               
+                             if( $fanhui ){
+
+                                 $bulk = new MongoDB\Driver\BulkWrite;
+
+                                 foreach( $fanhui as $woqu)  $bulk->delete( array( '_id'=> $woqu -> _id ), array( 'limit' => 1 ));
+                                 
+                                 $writeConcern = new MongoDB\Driver\WriteConcern( MongoDB\Driver\WriteConcern::MAJORITY, 1000);
+
+                                 try {
+     
+                                       $result = $this -> data -> executeBulkWrite( $this -> fenjie ( $this->table, $ykey), $bulk, $writeConcern);
+
+                                 }catch (MongoDB\Driver\Exception\BulkWriteException $e){ 
+                                     
+                                 }
+
+                                 $this ->f();
+                             }
+                              return true;
+
+                    }else if($leix == 'incr'){
                           
-						 $bulk = new MongoDB\Driver\BulkWrite;
+                             $bulk = new MongoDB\Driver\BulkWrite;
 
 
-						 $filter = ['_id' =>  $key];
-                         $options = [   'projection' => ['key'=>1,'time'=>1,'xianshi'=> 1],
-                                         'limit' => 1,
-	
-                                   ];
-                         $query = new MongoDB\Driver\Query($filter, $options);
-                         $cursor = $this->data->executeQuery($this->fenjie( $this->table, $ykey), $query);
-						 $fanhui = $cursor->toArray();
-						 if($fanhui){
-						 
-						      if( $fanhui['0']->xianshi  == 0)
+                             $filter = array( '_id' =>  $key );
+                             $options = array( 'projection' => array( 'key'=>1,'time'=>1,'xianshi'=> 1 ),
+                                             'limit' => 1,
+                                       );
 
-							      $fanh =  (int)unserialize($fanhui['0'] -> key) + (int)$value;
-							 
-							 else if( $fanhui['0']->xianshi + $fanhui['0']->time >= time())
+                             $query = new MongoDB\Driver\Query( $filter, $options);
+                             $cursor = $this -> data -> executeQuery( $this -> fenjie( $this->table, $ykey), $query);
+                             $fanhui = $cursor -> toArray();
+                             if($fanhui){
 
-								  $fanh =  (int)unserialize($fanhui['0'] -> key) + (int)$value;
+                                if( $fanhui['0'] -> xianshi  == 0)
 
-							 else $fanh = (int)$value;
-						 
-						 }else  $fanh = (int)$value;
+                                    $fanh = (float) unserialize( $fanhui['0'] -> key) + (float)$value;
+                                 
+                                else if( $fanhui['0'] ->xianshi + $fanhui['0'] -> time >= time())
 
-						      $this -> fass('set',$ykey,$fanh,$time);
+                                     $fanh =  (float) unserialize( $fanhui['0'] -> key) + (float) $value;
 
-                           return $fanh;
+                                else $fanh = (float) $value;
+                             
+                             }else   $fanh = (float) $value;
 
-                           
+                                $this -> fass('set',$ykey,$fanh,$time);
 
-							
-					 
-					 
-					 } else if( $leix == 'decr'){
+                                return $fanh;
 
-						 $bulk = new MongoDB\Driver\BulkWrite;
+                    }else if($leix == 'decr'){
+
+                             $bulk = new MongoDB\Driver\BulkWrite;
 
 
-						 $filter = ['_id' =>  $key];
-                         $options = [  'projection' => ['key'=>1,'time'=>1,'xianshi'=> 1],
-                                         'limit' => 1,
-	
-                                   ];
-                         $query = new MongoDB\Driver\Query($filter, $options);
-                         $cursor = $this->data->executeQuery($this->fenjie( $this->table, $ykey), $query);
-						 $fanhui = $cursor->toArray();
-						 if($fanhui){
-						 
-						      if( $fanhui['0']->xianshi  == 0)
+                             $filter = array( '_id' =>  $key );
+                             $options = array( 'projection' => array( 'key'=>1,'time'=>1,'xianshi'=> 1 ),
+                                             'limit' => 1,
+                                       );
+                             $query = new MongoDB\Driver\Query( $filter, $options);
+                             $cursor = $this -> data -> executeQuery( $this -> fenjie( $this -> table, $ykey), $query);
+                             $fanhui = $cursor -> toArray();
+                             if($fanhui){
+                             
+                                  if( $fanhui['0'] -> xianshi  == 0)
 
-							      $fanh =  (int)unserialize($fanhui['0'] -> key) - (int)$value;
-							 
-							 else if( $fanhui['0']->xianshi + $fanhui['0']->time >= time())
+                                      $fanh =  (float)unserialize($fanhui['0'] -> key) - (float)$value;
+                                 
+                                 else if( $fanhui['0'] -> xianshi + $fanhui['0'] -> time >= time())
 
-								  $fanh =  (int)unserialize($fanhui['0'] -> key) - (int)$value;
+                                      $fanh =  (float) unserialize( $fanhui['0'] -> key) - (float)$value;
 
-							 else $fanh = (int)$value;
-						 
-						 }else    $fanh = (int)$value;
+                                 else $fanh = (float)$value;
+                             
+                             }else    $fanh = (float)$value;
 
-						          $this -> fass('set',$ykey,$fanh,$time);
+                                      $this -> fass('set', $ykey, $fanh, $time);
 
-	             
-
-                           return $fanh;
-						   
-					 
-					 }  
-                       
-					
-						 
-
-		   
-		  
-	}
+                               return $fanh;
+                     }  
+    }
 
 
+    public function s( $key, $value, $time=0){  
+
+           return  $this -> fass( 'set', $key, $value, $time);
+    }
 
 
+    public function g($key){  
 
-	public function s($key,$value,$time=0){  
+           return  $this -> fass( 'get', $key);
+    }
 
-		       return  $this -> fass('set',$key,$value,$time);
-		  
-	}
 
-	public function g($key){  
+    public function a( $key, $value, $time=0){
 
-		         return  $this -> fass('get',$key);
-		   
-	}
+           return  $this -> fass('set', $key, $value, $time=0);
+    }
 
-	public function a( $key, $value, $time=0){
 
-		       return  $this -> fass('set',$key,$value,$time=0);
-		   
-	}
+    public function d( $key){  
 
-	public function d( $key){  
-		      
+           return  $this -> fass( 'delete', $key);
+    }
 
-			   return  $this -> fass('delete',$key);
-		   
-	}
-	public function f(){ 
 
-		      return  $this -> fass('flush_all');
-		   
-	}   
-	public function j( $key, $num=1,$time=0){ 
-		    
-			   return  $this -> fass('decr',$key, $num,$time);
-		   
-	}
+    public function f(){ 
 
-	public function ja( $key, $num=1,$time=0){
+           return  $this -> fass( 'flush_all');
+    }   
 
-		        return  $this -> fass('incr',$key, $num,$time);
-		   
-	}   
 
-	public function fg($key,$time=''){
-		   
-		       return  $this -> fass('get',$key);
-		  
-	}
+    public function j( $key, $num=1,$time=0){ 
+            
+           return  $this -> fass( 'decr', $key , $num , $time);
+    }
 
-	public function fs($key,$value,$time=0){
+    public function ja( $key, $num=1,$time=0){
 
-		       return  $this -> fass('set',$key,$value,$time);
-			
-		  
-	}
+           return  $this -> fass( 'incr', $key , $num , $time);
+    }   
+
+
+    public function fg($key,$time=''){
+           
+            return  $this -> fass( 'get', $key);
+    }
+
+
+    public function fs($key,$value,$time=0){
+
+           return  $this -> fass( 'set', $key , $value , $time);
+    }
 
 
 }
-
